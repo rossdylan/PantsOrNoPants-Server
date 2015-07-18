@@ -7,7 +7,8 @@ requires = ['flask',
             'gunicorn',
             'gevent',
             'celery',
-            'requests', ]
+            'requests',
+            'psycopg2', ]
 
 
 setup(name='ponp_server',

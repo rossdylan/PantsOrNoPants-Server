@@ -29,14 +29,14 @@ class User(Resource):
         """
         Get the user given by the uid. API KEY
         """
-        args = parser.parse_args()
+        args = parser.parse_args(strict=True)
         return {}, 200
 
     def put(self, uid):
         """
         Update an user. API KEY
         """
-        args = parser.parse_args()
+        args = parser.parse_args(strict=True)
         return {}, 200
 
 
@@ -45,7 +45,7 @@ class Pants(Resource):
         """
         Return the PCI Report for this user today. API KEY
         """
-        args = parser.parse_args()
+        args = parser.parse_args(strict=True)
         return {}, 200
 
 
