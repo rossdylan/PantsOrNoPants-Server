@@ -17,6 +17,7 @@ class User(Base):
     apikey = Column(String(65))
     height = Column(Float)
     weight = Column(Float)
+    age = Column(Integer)
     gender = Column(String(10))
     inclination = Column(String(7))
     reports = relationship("PCIReport", secondary=assoc_table)
@@ -41,6 +42,7 @@ class User(Base):
             'gender': self.gender,
             'height': self.height,
             'weight': self.weight,
+            'age': self.age,
             'inclination': self.inclination, }
 
     def __repr__(self):

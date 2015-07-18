@@ -20,22 +20,22 @@ class PantsOrNoPantsAlg:
 
   def masterFunction(self, height, weightP, sex, age, temp_inclination,
                    curr_high, curr_low, curr_wind_speed, curr_humidity):
-    
+
     # Sex
     if sex == "male":
       self.PCIthreshold +=  0.15
     elif sex == "female":
       self.PCIthreshold -=  0.15
-    
-    
+
+
     # BMI: weight in kilograms divided by the square of height in meters
     weightKg = weightP*0.453592
-    
+
     #input height is assumed to be in inches
     heightM = height / 36
-      
+
     bmi = weightKg / (heightM*heightM)
-    
+
 
 
     # BMI influence, relative to age
@@ -44,7 +44,7 @@ class PantsOrNoPantsAlg:
       self.bmiAdjust(avgBMI, bmi)
 
     elif 17 <= age < 20:
-      avgBMI = 21    
+      avgBMI = 21
       self.bmiAdjust(avgBMI, bmi)
 
     elif age < 17:
@@ -96,7 +96,7 @@ class PantsOrNoPantsAlg:
         else:
           self.PCIthreshold -= abs(difBMI)*.09
 
-      return 
+      return
 
 
 
@@ -106,9 +106,9 @@ class PantsOrNoPantsAlg:
 
     # set accoring to high temp
     if dif < 0:
-      PCI = 10*((100 - self.standardDis[abs(round(dif))])/100)
+      PCI = 10*((100 - self.standardDis[int(abs(round(dif)))])/100)
     elif dif >= 0:
-      PCI = 10*(self.standardDis[round(dif)]/100)
+      PCI = 10*(self.standardDis[int(round(dif))]/100)
 
 
     # heat index
@@ -116,7 +116,7 @@ class PantsOrNoPantsAlg:
     R = curr_humidity / 100
 
     # check R: integer or decimal percentage value?
-    heat_index = (-42.379) + (2.04901523*T) + (10.14333127*R) - (0.22475541*T*R) - (0.00683783*T*T) - (0.05481717*R*R) 
+    heat_index = (-42.379) + (2.04901523*T) + (10.14333127*R) - (0.22475541*T*R) - (0.00683783*T*T) - (0.05481717*R*R)
     + (0.00122874*T*T*R) + (0.00085282*T*R*R) - (0.00000199*T*T*R*R)
 
     print("Heat Index: ", heat_index)
@@ -194,7 +194,7 @@ class PantsOrNoPantsAlg:
       self.PCI += 0.3
 
     elif curr_wind_speed < 31:
-      self.PCI += 0.5    
+      self.PCI += 0.5
 
     elif curr_wind_speed < 46.3:
       self.PCI += 1.1
@@ -214,7 +214,7 @@ class PantsOrNoPantsAlg:
       startingProb = startingProb + startDifferential
       startDifferential = startDifferential*exp_constant
       count = count + 1
-    
+
 
 
 

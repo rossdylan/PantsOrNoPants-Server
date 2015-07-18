@@ -8,6 +8,7 @@ from ponp_server.parsers import (lang_parser,
                                  gender_parser,
                                  inclination_parser,
                                  apikey_parser)
+from ponp_server.pci_algo import PantsOrNoPantsAlg
 
 
 app = Flask(__name__)
@@ -81,19 +82,20 @@ class User(Resource):
         parser = ak_parser.copy()
         parser.add_argument('lang', type=lang_parser)
         parser.add_argument('height', type=float)
+        parser.add_argument('age', type=int)
         parser.add_argument('weight', type=float)
         parser.add_argument('gender', type=gender_parser)
         parser.add_argument('inclination', type=inclination_parser)
         args = parser.parse_args(strict=True)
-        valid_fields = frozenset(['lang', 'height', 'weight', 'gender', 'inclination'])
+        valid_fields = frozenset(['lang', 'height', 'weight', 'gender', 'inclination', 'age'])
         print args
         user_query = db_session.query(UserModel).filter(UserModel.apikey == args['apikey'])
         user = user_query.one()
 
         for key, value in args.iteritems():
-            if key in valid_fields:
+            if key in valid_fields and value is not None:
                 setattr(user, key, value)
-        db_session.merge(user)
+        user = db_session.merge(user, load=True)
         db_session.commit()
         return user.to_dict(), 200
 
@@ -109,6 +111,19 @@ class Pants(Resource):
         parser.add_argument('lng', type=float, required=True)
         args = parser.parse_args(strict=True)
         wdata = get_weather(args['lat'], args['lng'])
+        user_query = db_session.query(UserModel).filter(UserModel.apikey == args['apikey'])
+        user = user_query.one()
+        algo = PantsOrNoPantsAlg()
+        wdata['pornp'] = algo.masterFunction(user.height,
+                                             user.weight,
+                                             user.gender,
+                                             user.age,
+                                             user.inclination,
+                                             int(wdata['high_temp']),
+                                             int(wdata['low_temp']),
+                                             int(wdata['wind_speed']),
+                                             int(wdata['humidity']))
+
         return wdata, 200
 
 
