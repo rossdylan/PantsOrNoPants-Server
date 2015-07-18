@@ -22,23 +22,17 @@ class User(Base):
     reports = relationship("PCIReport", secondary=assoc_table)
 
     @staticmethod
-    def new_user(name, lang, lat, lng, passw, height, weight, gender, incl):
-        new = User(lang=lang,
-                   username=name,
-                   home_lat=lat,
-                   home_lng=lng,
+    def new_user(name, passw):
+        new = User(username=name,
                    password=passw,
-                   apikey=generate_apikey(name),
-                   height=height,
-                   weight=weight,
-                   gender=gender,
-                   inclination=incl)
+                   apikey=generate_apikey(name))
         db_session.add(new)
         db_session.commit()
         return new
 
     def to_dict(self):
         return {
+            'id': self.id,
             'lang': self.lang,
             'username': self.username,
             'home_lat': self.home_lat,

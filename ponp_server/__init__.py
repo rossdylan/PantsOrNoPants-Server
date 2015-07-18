@@ -2,6 +2,8 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from ponp_server.database import db_session
 from ponp_server.models.users import User as UserModel
+from ponp_server.utils import generate_apikey
+from ponp_server.weather import get_weather
 from ponp_server.parsers import (lang_parser,
                                  gender_parser,
                                  inclination_parser,
@@ -30,16 +32,17 @@ class Auth(Resource):
         Authenticate as a user
         """
         parser = reqparse.RequestParser()
-        parser.add_argument('user', type=str, required=True)
-        parser.add_argument('pass', type=str, required=True)
+        parser.add_argument('username', type=str, required=True)
+        parser.add_argument('password', type=str, required=True)
+        args = parser.parse_args(strict=True)
 
         query = db_session.query(UserModel).filter(
-            UserModel.username == args['name'])
+            UserModel.username == args['username'])
         if query.count() > 0:
             user = query.one()
-            if user.password == args['pass']:
+            if user.password == args['password']:
                 user.apikey = generate_apikey(user.username)
-                db_session.update(user)
+                db_session.merge(user)
                 db_session.commit()
                 return {'apikey': user.apikey}, 200
         return {"message": {"pass": "User or Password is Incorrect",
@@ -52,28 +55,11 @@ class UserList(Resource):
         Create a new user. NO API KEY
         """
         parser = reqparse.RequestParser()
-        parser.add_argument('lang', type=lang_parser)
-        parser.add_argument('user', type=str, required=True)
-
-        parser.add_argument('home_lat', type=float, required=True)
-        parser.add_argument('home_lng', type=float, required=True)
-
+        parser.add_argument('username', type=str, required=True)
         parser.add_argument('password', type=str, required=True)
-        parser.add_argument('height', type=float, required=True)
-        parser.add_argument('weight', type=float, required=True)
-        parser.add_argument('gender', type=gender_parser, required=True)
-        parser.add_argument('inclination', type=inclination_parser, required=True)
-
         args = parser.parse_args(strict=True)
-        user = UserModel.new_user(args['user'],
-                                  args['lang'],
-                                  args['home_lat'],
-                                  args['home_lng'],
-                                  args['password'],
-                                  args['height'],
-                                  args['weight'],
-                                  args['gender'],
-                                  args['inclination'])
+        print(args)
+        user = UserModel.new_user(args['username'], args['password'])
         return user.to_dict(), 200
 
 
@@ -93,8 +79,23 @@ class User(Resource):
         """
 
         parser = ak_parser.copy()
+        parser.add_argument('lang', type=lang_parser)
+        parser.add_argument('height', type=float)
+        parser.add_argument('weight', type=float)
+        parser.add_argument('gender', type=gender_parser)
+        parser.add_argument('inclination', type=inclination_parser)
         args = parser.parse_args(strict=True)
-        return {}, 200
+        valid_fields = frozenset(['lang', 'height', 'weight', 'gender', 'inclination'])
+        print args
+        user_query = db_session.query(UserModel).filter(UserModel.apikey == args['apikey'])
+        user = user_query.one()
+
+        for key, value in args.iteritems():
+            if key in valid_fields:
+                setattr(user, key, value)
+        db_session.merge(user)
+        db_session.commit()
+        return user.to_dict(), 200
 
 
 class Pants(Resource):
@@ -104,8 +105,11 @@ class Pants(Resource):
         """
 
         parser = ak_parser.copy()
+        parser.add_argument('lat', type=float, required=True)
+        parser.add_argument('lng', type=float, required=True)
         args = parser.parse_args(strict=True)
-        return {}, 200
+        wdata = get_weather(args['lat'], args['lng'])
+        return wdata, 200
 
 
 api.add_resource(Auth, '/api/v1/auth')

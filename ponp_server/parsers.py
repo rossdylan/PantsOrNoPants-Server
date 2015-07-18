@@ -5,6 +5,7 @@ from ponp_server.models.users import User
 
 def lang_parser(lang):
     lang = lang.lower()
+    print lang
     if lang not in locale.Pants:
         raise ValueError(
             'Language Must be one of {0}'.format(locale.Pants.iterkeys()))
