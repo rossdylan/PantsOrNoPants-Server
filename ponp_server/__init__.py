@@ -107,10 +107,10 @@ class Pants(Resource):
         """
 
         parser = ak_parser.copy()
-        parser.add_argument('lat', type=float, required=True)
-        parser.add_argument('lng', type=float, required=True)
+        parser.add_argument('lat', type=str, required=True)
+        parser.add_argument('lng', type=str, required=True)
         args = parser.parse_args(strict=True)
-        wdata = get_weather(args['lat'], args['lng'])
+        wdata = get_weather(float(args['lat']), float(args['lng']))
         user_query = db_session.query(UserModel).filter(UserModel.apikey == args['apikey'])
         user = user_query.one()
         algo = PantsOrNoPantsAlg()
