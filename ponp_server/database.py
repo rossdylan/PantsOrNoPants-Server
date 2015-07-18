@@ -12,6 +12,6 @@ Base.query = db_session.query_property()
 
 
 def init_db():
-    import pnop_server.models.users
-    import pnop_server.models.reports  # Data used to generate a PCI
+    import ponp_server.models.users
+    import ponp_server.models.reports  # Data used to generate a PCI
     Base.metadata.create_all(bind=engine)

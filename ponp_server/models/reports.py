@@ -4,8 +4,8 @@ from sqlalchemy import (Column,
                         Float,
                         ForeignKey,
                         Table,
-                        relationship,
                         DateTime)
+from sqlalchemy.orm import relationship
 
 from ponp_server.database import Base
 

@@ -3,6 +3,9 @@ from setuptools import setup, find_packages
 
 requires = ['flask',
             'flask-restful',
+            'sqlalchemy',
+            'sqlalchemy-utils',
+            'passlib',
             'Flask-SQLAlchemy',
             'gunicorn',
             'gevent',
@@ -18,4 +21,8 @@ setup(name='ponp_server',
       author_email='ross.delinger@gmail.com',
       packages=find_packages(),
       install_requires=requires,
-      zip_safe=False)
+      zip_safe=False,
+      entry_points="""
+      [console_scripts]
+      ponp_server_init_db = ponp_server.database:init_db
+      """)
