@@ -1,6 +1,6 @@
 import ponp_server.localization as locale
-from ponp_server.database import db_sessions
-from pobp_server.models.users import User
+from ponp_server.database import db_session
+from ponp_server.models.users import User
 
 
 def lang_parser(lang):
@@ -27,7 +27,7 @@ def inclination_parser(incl):
 
 
 def apikey_parser(key):
-    query = db_session.query(User).filter(User.apikey=key)
+    query = db_session.query(User).filter(User.apikey == key)
     if query.count() == 0:
         raise ValueError('Please enter a valid api key')
     return key

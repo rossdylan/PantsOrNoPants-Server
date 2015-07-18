@@ -34,7 +34,7 @@ class Auth(Resource):
         parser.add_argument('pass', type=str, required=True)
 
         query = db_session.query(UserModel).filter(
-            UserModel.username=args['name'])
+            UserModel.username == args['name'])
         if query.count() > 0:
             user = query.one()
             if user.password == args['pass']:
